@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>	
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تطبيق نقل البضائع والمعدات (Camio DZ)</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- إعدادات تطبيق الويب التقدمي (PWA) للتثبيت على الهاتف -->
+<meta name="theme-color" content="#059669">
+
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
+%22name%22: %22Camio DZ - توصيل ونقل%22,
+%22short_name%22: %22Camio DZ%22,
+%22start_url%22: %22.%22,
+%22display%22: %22standalone%22,
+%22background_color%22: %22%23f9fafb%22,
+%22theme_color%22: %22%23059669%22,
+%22icons%22: [
+{
+%22src%22: %22https://cdn-icons-png.flaticon.com/512/2921/2921222.png%22,
+%22sizes%22: %22512x512%22,
+%22type%22: %22image/png%22
+}
+ ]
+}">
+
+<style>
+body { font-family: 'Cairo', sans-serif; }
+
+</style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- Header -->
+<header class="bg-emerald-600 text-white shadow-md sticky top-0 z-50">
+<div class="container mx-auto px-4 py-3 flex justify-between items-center">
+<div class="flex items-center space-x-2 space-x-reverse">
+<i class="fa-solid fa-truck-fast text-2xl"></i>
+<h1 class="text-xl font-bold">توصيل ونقل (Camio DZ)</h1>
+</div>
+<div class="flex space-x-2 space-x-reverse text-xs md:text-sm items-center">
+<button onclick="switchTab('client')" id="btn-client" class="bg-emerald-700 px-3 py-1.5 rounded-lg font-semibold transition">الزبون</
+
+button>
+<button onclick="switchTab('driver')" id="btn-driver" class="bg-emerald-800/60 px-3 py-1.5 rounded-lg font-semibold transition">السائقين والمعدات</button>
+<button onclick="switchTab('admin')" id="btn-admin" class="bg-emerald-800/60 px-3 py-1.5 rounded-lg font-semibold transition">الإدارة والأرباح</button>
+</div>
+</div>
+</header>
+
+<main class="container mx-auto px-4 py-6 max-w-4xl">
+
+<!-- تنبيه تثبيت التطبيق على الهاتف -->
+<div id="install-banner" class="hidden bg-emerald-50 border border-emerald-200 p-4 rounded-2xl mb-6 flex justify-between items-
+
+center shadow-sm">
+<div class="flex items-center gap-3">
+<i class="fa-solid fa-mobile-screen-button text-2xl text-emerald-600"></i>
+<div>
+<h3 class="font-bold text-sm text-emerald-900">ثبت تطبيق Camio DZ على هاتفك</h3>
+<p class="text-xs text-emerald-700">احصل على تجربة أسرع وأشبه بتطبيقات المتجر الرسمية.</p>
+</div>
+</div>
+<button id="install-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition">
+تثبيت الآن
+</button>
+</div>
+
+<!-- Client Section -->
+
+<section id="tab-client" class="space-y-6">
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+<h2 class="text-lg font-bold mb-4 text-emerald-700 flex items-center gap-2">
+<i class="fa-solid fa-box-open"></i> أضف طلبك أو عرضك (سلع أو معدات ثقيلة)
+</h2>
+<form id="order-form" onsubmit="handlePostOrder(event)" class="space-y-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium mb-1">وسيلة النقل أو المعدة المطلوبة</label>
+<select id="vehicle-type" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-none">
+<option value="دراجة نارية (موتور)">دراجة نارية (للطلبات الصغيرة والطرود)</option>
+
+<option value="سيارة تاكسي">سيارة تاكسي (للكراتين والسلع الخفيفة)</option>
+<option value="شاحنة خفيفة (كاميوني)">شاحنة خفيفة (كاميوني للبضائع المتوسطة)</option>
+<option value="شاحنة كبيرة (Poids Lourd)">شاحنة كبيرة (للبضائع الثقيلة)</option>
+<option value="مقطورة كبرى (Semi-Trailer)">مقطورة كبرى (Semi-Trailer للحاويات)</option>
+<option value="رافعة شوكية (Chariot Élévateur)">رافعة شوكية (لنقل ورفع السلع)</option>
+<option value="حفارة / آلة أشغال (Pelle Mécanique)">حفارة / آلة أشغال عمومية</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1">طريقة تأكيد التسليم المفضلة</label>
+<select id="confirmation-method" class="w-full border rounded-xl p-2.5 bg-gray-50 outline-
+
+none">
+<option value="otp">كود سري (OTP)</option>
+<option value="photo">صورة إثبات التوصيل أو الموقع</option>
+<option value="oneclick">تأكيد الزبون بضغطة زر</option>
+<option value="qrcode">مسح رمز الاستجابة (QR Code)</option>
+</select>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1">تفاصيل السلعة أو الخدمة المطلوبة</label>
+<textarea id="item-desc" rows="3" placeholder="مثال: أحتاج نقل بضائع أو معدات..." class="w-full border rounded-xl p-3 bg-gray-50 outline-none" required></textarea>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 
+
+gap-4">
+<div>
+<label class="block text-sm font-medium mb-1">مكان الاستلام أو موقع الورشة</label>
+<input type="text" id="pickup-loc" placeholder="مثال: سوق الجملة" class="w-full border rounded-xl p-2.5 bg-gray-50" required>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1">مكان التسليم أو الوجهة</label>
+<input type="text" id="drop-loc" placeholder="مثال: وسط المدينة" class="w-full border rounded-xl p-2.5 bg-gray-50" required>
+</div>
+</div>
+
+<!-- خيار الفاتورة الاختياري -->
+<div class="border border-emerald-100 bg-emerald-50/40 p-4 rounded-xl space-y-3">
+
+<label class="flex items-center space-x-2 space-x-reverse cursor-pointer">
+<input type="checkbox" id="has-invoice" onchange="toggleInvoiceFields()" class="w-4 h-4 text-emerald-600 rounded">
+<span class="text-sm font-bold text-gray-700">هذه الرحلة تتطلب نقل فاتورة / وصل بضاعة مرافق</span>
+</label>
+<div id="invoice-container" class="hidden grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+<div>
+<label class="block text-xs font-medium mb-1">قيمة البضاعة/المعدة في الفاتورة (دج)</label>
+<input type="number" id="invoice-amount" placeholder="مثال: 50000" class="w-full border rounded-lg p-2 bg-white text-sm">
+</div>
+<div>
+<label class="block text-xs font-medium 
+
+mb-1">صورة الفاتورة / وصل الإرسال</label>
+<input type="file" id="invoice-file" accept="image/*" class="w-full border rounded-lg p-1.5 bg-white text-xs">
+</div>
+</div>
+</div>
+
+<button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-md">
+نشر الطلب في السوق
+</button>
+</form>
+</div>
+
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+<h3 class="text-md font-bold mb-4 text-
+
+gray-700">طلباتي النشطة</h3>
+<div id="client-orders-list" class="space-y-4">
+<p class="text-gray-400 text-center py-4">لا توجد طلبات نشطة حالياً.</p>
+</div>
+</div>
+</section>
+
+<!-- Driver Section -->
+<section id="tab-driver" class="space-y-6 hidden">
+<!-- تسجيل سائق جديد -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+<h2 class="text-lg font-bold mb-4 text-emerald-700 flex items-center gap-2">
+<i class="fa-solid fa-id-card"></i> انضم إلينا (تسجيل شاحنة أو معدة)
+</h2>
+<form id="driver-reg-form" 
+
+onsubmit="handleDriverRegister(event)" class="space-y-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium mb-1">الاسم الكامل</label>
+<input type="text" id="d-name" placeholder="الاسم واللقب" class="w-full border rounded-xl p-2.5 bg-gray-50" required>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1">رقم الهاتف</label>
+<input type="tel" id="d-phone" placeholder="05XXXXXXXX" class="w-full border rounded-xl p-2.5 bg-gray-50" required>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 
+
+gap-4">
+<div>
+<label class="block text-sm font-medium mb-1">نوع المركبة أو المعدة</label>
+<select id="d-vehicle" class="w-full border rounded-xl p-2.5 bg-gray-50">
+<option value="دراجة نارية (موتور)">دراجة نارية</option>
+<option value="سيارة تاكسي">سيارة تاكسي</option>
+<option value="شاحنة خفيفة (كاميوني)">شاحنة خفيفة (كاميوني)</option>
+<option value="شاحنة كبيرة (Poids Lourd)">شاحنة كبيرة</option>
+<option value="مقطورة كبرى (Semi-Trailer)">مقطورة كبرى (Semi-Trailer)</option>
+<option value="رافعة شوكية (Chariot Élévateur)">رافعة شوكية</option>
+<option value="حفارة / آلة أشغال (Pelle Mécanique)">حفارة / آلة أشغال</option>
+</select>
+
+</div>
+<div>
+<label class="block text-sm font-medium mb-1">رقم لوحة المركبة أو التسجيل</label>
+<input type="text" id="d-plate" placeholder="مثال: 01234-116-16" class="w-full border rounded-xl p-2.5 bg-gray-50" required>
+</div>
+</div>
+<button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition">
+إرسال طلب الانضمام للمنصة
+</button>
+</form>
+</div>
+
+<!-- السوق المفتوح -->
+<div class="bg-white p-6 rounded-2xl shadow-
+
+sm border border-gray-100">
+<h2 class="text-lg font-bold mb-4 text-emerald-700 flex items-center gap-2">
+<i class="fa-solid fa-route"></i> السوق المفتوح للطلبات
+</h2>
+<div id="driver-orders-list" class="space-y-4">
+<p class="text-gray-400 text-center py-4">الطلبات المتاحة للتنفيذ ستظهر هنا.</p>
+</div>
+</div>
+</section>
+
+<!-- Admin Section -->
+<section id="tab-admin" class="space-y-6 hidden">
+<!-- إعدادات الأسابيع والأرباح -->
+<div class="bg-emerald-50 border border-emerald-200 p-6 rounded-2xl shadow-sm space-y-4">
+
+<h2 class="text-lg font-bold text-emerald-800 flex items-center gap-2">
+<i class="fa-solid fa-chart-line"></i> إعدادات التشغيل وأرباح المنصة
+</h2>
+<div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl border">
+<div>
+<label class="block text-sm font-bold text-gray-700 mb-1">اختر الأسبوع الحالي لتطبيق المنصة:</label>
+<select id="current-week-select" onchange="updateProjectWeek()" class="border rounded-lg p-2 bg-gray-50 text-sm font-bold text-emerald-700 outline-none">
+<option value="1">الأسبوع الأول (بدون عمولة - مجاني 100%)</option>
+<option value="2">الأسبوع الثاني (بدون عمولة - مجاني 100%)</option>
+
+<option value="3" selected>الأسبوع الثالث فما فوق (تفعيل عمولة 5% للمنصة ✅)</option>
+</select>
+</div>
+<div class="text-center md:text-left">
+<span class="text-xs text-gray-500 block">إجمالي أرباح المنصة المحققة:</span>
+<span id="total-admin-revenue" class="text-2xl font-extrabold text-emerald-600">0 دج</span>
+</div>
+</div>
+</div>
+
+<!-- مراجعة السائقين -->
+<div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+<h2 class="text-lg font-bold mb-4 text-red-600 flex items-center gap-2">
+<i class="fa-solid fa-user-shield"></i> مراجعة 
+
+السائقين وأصحاب المعدات
+</h2>
+<div id="admin-drivers-list" class="space-y-4">
+<p class="text-gray-400 text-center py-4">لا توجد طلبات تسجيل معلقة.</p>
+</div>
+</div>
+</section>
+
+</main>
+
+<script>
+let orders = [];
+let drivers = [
+{ id: 1, name: 'سليم بوحجر', phone: '0555123456', vehicle: 'شاحنة كبيرة (Poids Lourd)', plate: '01234-116-16', status: 'مفعل ✅' }
+ ];
+let currentWeek = 3;
+let platformRevenue = 0;
+
+
+// كود إدارة التثبيت كبرنامج (PWA)
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+e.preventDefault();
+deferredPrompt = e;
+document.getElementById('install-banner').classList.remove('hidden');
+});
+
+document.getElementById('install-btn').addEventListener('click', async () => {
+if (deferredPrompt) {
+deferredPrompt.prompt();
+const { outcome } = await deferredPrompt.userChoice;
+if (outcome === 'accepted') {
+document.getElementById('install-banner
+
+
+
+
+
+
+
+
+ 
+
+ 
